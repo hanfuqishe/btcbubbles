@@ -10,15 +10,15 @@
 
 
 from __future__ import print_function
-import sys,os
+import sys
 from datetime import datetime
 import urllib.request
 import xlsxwriter, csv
+import webbrowser
 
-
-price_file = "market_price.csv"
-cap_file = "market_cap.csv"
-addr_file = "unique_address.csv"
+price_file = ".market_price.csv"
+cap_file = ".market_cap.csv"
+addr_file = ".unique_address.csv"
 result_file = "btc_bubbles.xlsx"
 
 def Schedule(blocks, blocksize, totalsize):
@@ -26,9 +26,10 @@ def Schedule(blocks, blocksize, totalsize):
     sys.stdout.flush()
 
 def getfile(url, saveasfile):
-    print("正在下载: ", url, " ==> ", saveasfile)
+    #print("正在下载: ", url, " ==> ", saveasfile)
+    sys.stdout.write("Downloading "+ saveasfile)
     urllib.request.urlretrieve(url, saveasfile, Schedule)
-    print("")
+    print("done.")
 
 def download_data():
     getfile("https://api.blockchain.info/charts/market-price?scale=1&timespan=all&daysAverageString=7&format=csv", price_file)
@@ -41,7 +42,7 @@ def download_data():
 def print_version():
     print("")
     print("===================================")
-    print("     比特币泡沫指数计算器 v1.0     ")
+    print("     比特币泡沫指数计算器 v1.01    ")
     print("===== By hanfuqishe@gmail.com =====")
     print("")
     print("根据江卓尔先生提出的泡沫指数计算公式自动下载最新数据并生成比特币泡沫指数")
@@ -55,7 +56,7 @@ def print_version():
 
 def main():
     print_version()
-    download_data()
+    #download_data()
 
     workbook_result = xlsxwriter.Workbook(result_file)
     worksheet_result = workbook_result.add_worksheet()
@@ -92,7 +93,6 @@ def main():
         i+=1
 
     rowcount=i
-    # print("rowcount", i)
 
     chart_col = workbook_result.add_chart({"type": "line"})
 
@@ -116,7 +116,7 @@ def main():
     chart_col.set_y_axis({"name": "价格"})
     chart_col.set_y2_axis({"name": "泡沫"})
 
-    #chart_col.set_style(1)
+    chart_col.set_style(4)
 
     # worksheet_result.insert_chart("A10", chart_col, {"x_offset": 25, "y_offset": 10})
     chartsheet = workbook_result.add_chartsheet()
@@ -126,8 +126,8 @@ def main():
     workbook_result.close()
 
 
-    print("打开图表...")
-    os.system(result_file)
-
+    print("Open chart..")
+    webbrowser.open(result_file)
+    
 main()
 
